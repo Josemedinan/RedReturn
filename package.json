@@ -8,7 +8,9 @@
     "start": "next start",
     "test": "vitest run",
     "test:watch": "vitest",
-    "api": ".\\.venv\\Scripts\\python.exe -m uvicorn api.main:app --env-file .env.local --reload --port 8000"
+    "api": "python -m uvicorn api.main:app --reload --port 8000",
+    "typecheck": "tsc --noEmit",
+    "test:api": "python -m pytest api -q"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.6",

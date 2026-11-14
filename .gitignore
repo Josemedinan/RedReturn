@@ -11,3 +11,5 @@ __pycache__/
 coverage/
 site-archive.tar.gz
 docs/qa/
+.claude/
+.env.local
