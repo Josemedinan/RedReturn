@@ -1,9 +1,9 @@
 "use client";
-import { CheckCircle2, CircleAlert, XCircle } from "lucide-react";
+import { CheckCircle2, CircleAlert, LayoutDashboard, XCircle } from "lucide-react";
 import { useMissionStore } from "@/lib/store";
 import { greatCircleDistance } from "@/lib/mars";
 import { coord, fmt, FACTOR_LABEL, STRATEGY_LABEL } from "@/lib/format";
-import { Badge, Loading, Notice, Panel, Stat, ErrorState } from "../ui";
+import { Badge, Loading, Notice, PageHead, Panel, Stat, ErrorState } from "../ui";
 
 function Check({ ok, warn, children }: { ok: boolean; warn?: boolean; children: React.ReactNode }) {
   const I = ok ? CheckCircle2 : warn ? CircleAlert : XCircle;
@@ -17,32 +17,31 @@ export function OverviewTab() {
   const m = rec?.mission;
   return (
     <div className="stack" style={{ gap: 12 }}>
-      <Panel title="Mission" right={<button className="btn sm primary" onClick={s.loadDemo} disabled={!s.snapshot}>Load judge demo</button>}>
+      <PageHead icon={LayoutDashboard} title="Overview" right={<button className="btn sm primary" onClick={s.loadDemo} disabled={!s.snapshot}>Load judge demo</button>}>Mission status at a glance: the question, the recommended route, the return margin and what is still unchecked.</PageHead>
+      {s.busy.alt && !alt && <Loading label="Planning routes on the MOLA DEM…" />}
+      {s.errors.alternatives && !alt && <ErrorState message={s.errors.alternatives} retry={() => void s.refreshAlternatives()} />}
+      {alt && <div className="kpis">
+        <Stat label="Recommended" value={alt.recommended ? STRATEGY_LABEL[alt.recommended].split(" ")[0] : "None"} detail={alt.recommended ? "meets every modelled constraint" : "no route satisfies all constraints"} tone={alt.recommended ? "ok" : "bad"} />
+        <Stat label="Return margin" value={m ? `${fmt(m.limiting_margin_percent)}%` : "—"} detail={m ? `limited by ${FACTOR_LABEL[m.limiting_factor].toLowerCase()}` : undefined} tone={m ? (m.feasible_within_model ? "ok" : "bad") : undefined} />
+        <Stat label="Terrain resolution" value={`${fmt(alt.resolution.pixel_size_m, 0)} m`} detail="hazards < ~1 km unresolved" tone="warn" />
+        <Stat label="Data gaps on route" value={rec ? rec.metrics.nodata_samples + rec.metrics.outside_coverage_samples : "—"} detail={`${rec ? rec.metrics.interpolated_samples : "—"} interpolated samples`} />
+      </div>}
+      <Panel title="Mission">
         <div className="grid g2">
           <div className="stack">
             <h2 style={{ fontSize: 20 }}>Can the crew reach the target, do the science, and return?</h2>
             <p className="muted" style={{ margin: 0 }}>Plan a Mars surface excursion with real NASA MOLA elevations, see why alternatives differ, stress it with failures, and get a revised mission when the plan breaks. Every number is traceable; nothing is certified.</p>
-            <dl className="kv">
-              <dt>Base</dt><dd>{coord(s.origin.lat, s.origin.lon)}</dd><dt>Target</dt><dd>{coord(s.destination.lat, s.destination.lon)}</dd>
-              <dt>Great-circle</dt><dd>{fmt(dist)} km one way</dd><dt>Crew / speed</dt><dd>{s.config.crew} · {s.config.speedKmh} km/h</dd>
-              <dt>Science time</dt><dd>{fmt(s.config.scienceHours)} h{s.stops.length ? ` + ${s.stops.length} stop(s)` : ""}</dd><dt>Slope limit</dt><dd>{s.config.maxSlopeDeg}° (scenario)</dd>
-              <dt>Reserve / contingency</dt><dd>{s.config.reservePercent}% / {s.config.contingencyPercent}%</dd>
-            </dl>
           </div>
-          <div className="stack">
-            {s.busy.alt && !alt && <Loading label="Planning routes on the MOLA DEM…" />}
-            {s.errors.alternatives && !alt && <ErrorState message={s.errors.alternatives} retry={() => void s.refreshAlternatives()} />}
-            {alt && <div className="grid g2">
-              <Stat label="Recommended" value={alt.recommended ? STRATEGY_LABEL[alt.recommended].split(" ")[0] : "None"} detail={alt.recommended ? "meets every modelled constraint" : "no route satisfies all constraints"} tone={alt.recommended ? "ok" : "bad"} />
-              <Stat label="Return margin" value={m ? `${fmt(m.limiting_margin_percent)}%` : "—"} detail={m ? `limited by ${FACTOR_LABEL[m.limiting_factor].toLowerCase()}` : undefined} tone={m ? (m.feasible_within_model ? "ok" : "bad") : undefined} />
-              <Stat label="Terrain resolution" value={`${fmt(alt.resolution.pixel_size_m, 0)} m`} detail="hazards < ~1 km unresolved" tone="warn" />
-              <Stat label="Data gaps on route" value={rec ? rec.metrics.nodata_samples + rec.metrics.outside_coverage_samples : "—"} detail={`${rec ? rec.metrics.interpolated_samples : "—"} interpolated samples`} />
-            </div>}
-          </div>
+          <dl className="kv" style={{ alignContent: "start" }}>
+            <dt>Base</dt><dd>{coord(s.origin.lat, s.origin.lon)}</dd><dt>Target</dt><dd>{coord(s.destination.lat, s.destination.lon)}</dd>
+            <dt>Great-circle</dt><dd>{fmt(dist)} km one way</dd><dt>Crew / speed</dt><dd>{s.config.crew} · {s.config.speedKmh} km/h</dd>
+            <dt>Science time</dt><dd>{fmt(s.config.scienceHours)} h{s.stops.length ? ` + ${s.stops.length} stop(s)` : ""}</dd><dt>Slope limit</dt><dd>{s.config.maxSlopeDeg}° (scenario)</dd>
+            <dt>Reserve / contingency</dt><dd>{s.config.reservePercent}% / {s.config.contingencyPercent}%</dd>
+          </dl>
         </div>
       </Panel>
-      <div className="grid g2">
-        <Panel title="Readiness summary">
+      <div className="dash">
+        <div className="c5"><Panel title="Readiness summary">
           {!alt ? <Loading label="Waiting for terrain analysis…" /> : (
             <ul className="stack" style={{ listStyle: "none", margin: 0, padding: 0 }}>
               <Check ok={true}>Numeric terrain coverage: MOLA window <b>{alt.tile.id}</b>, {fmt(alt.tile.valid_fraction * 100, 1)}% valid cells.</Check>
@@ -54,13 +53,13 @@ export function OverviewTab() {
             </ul>
           )}
         </Panel>
-        <Panel title="The decision story">
+        </div><div className="c7"><Panel title="The decision story">
           {s.snapshot ? <ol className="stack" style={{ margin: 0, paddingLeft: 18 }}>{s.snapshot.demo.narrative.map(n => <li key={n}>{n}</li>)}</ol> : <p className="muted">Demo story unavailable.</p>}
           <div className="row" style={{ marginTop: 10 }}>
             <button className="btn sm" onClick={() => s.setTab("terrain")}>1 · See terrain</button><button className="btn sm" onClick={() => s.setTab("planner")}>2 · Compare routes</button>
             <button className="btn sm" onClick={() => s.setTab("risk")}>3 · Quantify uncertainty</button><button className="btn sm" onClick={() => s.setTab("emergency")}>4 · Break it</button>
           </div>
-        </Panel>
+        </Panel></div>
       </div>
       <Notice tone="info">Challenge: <b>Interplanetary Survival Guide: Martian Map</b> (NASA Space Apps 2026). RedReturn layers topographic (MOLA numeric), optical (Viking), thermal (THEMIS/TES) and radiation (published surface dose, as a model parameter) context for a route a crew could plan. <Badge tone="warn">Prototype</Badge></Notice>
     </div>

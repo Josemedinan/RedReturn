@@ -1,11 +1,11 @@
 "use client";
 import { useState } from "react";
-import { Download } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { useMissionStore } from "@/lib/store";
 import { coord } from "@/lib/format";
 import { ApiFailure } from "@/lib/api";
 import { buildPdf, download, fetchGeoJson, fetchReportJson, geoJsonFrom } from "@/lib/report";
-import { Badge, ClassBadge, Notice, Panel } from "../ui";
+import { Badge, ClassBadge, Notice, PageHead, Panel } from "../ui";
 
 const ALIGN: [string, string][] = [
   ["Layered, integrated view from multiple NASA missions (≥3 data kinds)", "Topographic: MOLA numeric DEM (analysis) + MOLA colour shade · Optical: Viking MDIM 2.1 · Thermal: THEMIS day/night IR, TES thermal inertia · Radiation: published MSL RAD rate as model parameter. Tiles are display layers; only MOLA elevation enters calculations."],
@@ -36,7 +36,8 @@ export function ReportsTab() {
   });
   const pdf = () => run("PDF", async () => { if (!alt) throw new Error("no analysis available"); buildPdf({ alt, risk: s.risk, scenario: s.scenario, datasets: s.datasets, snapshot: s.snapshot, origin: coord(s.origin.lat, s.origin.lon), destination: coord(s.destination.lat, s.destination.lon) }).save("redreturn-report.pdf"); });
   return (
-    <div className="stack">
+    <div className="stack" style={{ gap: 12 }}>
+      <PageHead icon={FileText} title="Reports">Export the analysis, see where every dataset comes from, and check the challenge requirements against what RedReturn actually does.</PageHead>
       <Panel title="Export mission report" right={<Badge tone="warn">not certified</Badge>}>
         <div className="row"><button className="btn primary" onClick={pdf} disabled={!alt || busy}><Download size={14} />PDF report</button><button className="btn" onClick={jsonReport} disabled={!alt || busy}><Download size={14} />JSON + reproducibility</button><button className="btn" onClick={geo} disabled={!alt || busy}><Download size={14} />GeoJSON routes</button></div>
         {msg && <p className="small" role="status" style={{ marginBottom: 0 }}>{msg}</p>}

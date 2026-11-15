@@ -1,8 +1,8 @@
 "use client";
 import { useRef, useState } from "react";
-import { Send } from "lucide-react";
+import { Bot, Send } from "lucide-react";
 import { useMissionStore } from "@/lib/store";
-import { Badge, ErrorState, Loading, Notice, Panel } from "../ui";
+import { Badge, ErrorState, Loading, Notice, PageHead, Panel } from "../ui";
 
 const SUGGESTED = ["Why is this route preferable?", "What happens if battery capacity drops by 25%?", "How much additional oxygen would the mission require?",
   "Which assumption contributes the most uncertainty?", "What evidence supports this terrain classification?", "Which parts of the route lack adequate scientific data?",
@@ -12,8 +12,10 @@ export function AresTab() {
   const s = useMissionStore(); const [q, setQ] = useState(""); const end = useRef<HTMLDivElement>(null);
   const ask = async (text: string) => { if (!text.trim()) return; setQ(""); await s.ask(text.trim()); setTimeout(() => end.current?.scrollIntoView({ behavior: "smooth", block: "end" }), 50); };
   return (
-    <div className="grid split-r">
-      <div className="stack">
+    <div className="stack" style={{ gap: 12 }}>
+    <PageHead icon={Bot} title="ARES">Ask about the current plan. Answers come from the calculation engines, with the evidence and uncertainty shown.</PageHead>
+    <div className="dash">
+      <div className="col c4 side-sticky">
         <Panel title="Ask ARES"><form className="row" style={{ flexWrap: "nowrap" }} onSubmit={e => { e.preventDefault(); void ask(q); }}>
           <input type="search" value={q} onChange={e => setQ(e.target.value)} placeholder="Ask about the current plan…" aria-label="Question for ARES" maxLength={500} />
           <button className="btn primary" type="submit" disabled={s.busy.ares || !s.alternatives} aria-label="Send question"><Send size={14} /></button></form>
@@ -21,7 +23,7 @@ export function AresTab() {
         </Panel>
         <Notice tone="info"><b>How ARES works.</b> It routes your question to the deterministic engines (routes, mission model, Monte Carlo, emergency replanning) and writes the answer from their outputs. Language-model paraphrase is optional, disabled here, and would never supply numbers.</Notice>
       </div>
-      <div className="stack">
+      <div className="col c8">
         {!s.alternatives && <Panel title="ARES"><Loading label="Waiting for a route plan…" /></Panel>}
         <div className="chat" aria-live="polite">
           {s.chat.length === 0 && s.alternatives && <Panel title="No questions yet"><p className="muted small">Pick a suggested question. Each answer lists the calculations used and its uncertainty.</p></Panel>}
@@ -38,6 +40,7 @@ export function AresTab() {
           <div ref={end} />
         </div>
       </div>
+    </div>
     </div>
   );
 }

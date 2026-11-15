@@ -50,7 +50,7 @@ test.describe("Responsive layout", () => {
         const over = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
         const culprits = over > 0 ? await page.evaluate(() => { const w = document.documentElement.clientWidth; return [...document.querySelectorAll("body *")].filter(e => e.getBoundingClientRect().right > w + 1 && !e.closest(".bottomnav")).slice(0, 6).map(e => `${e.tagName}.${e.className} right=${Math.round(e.getBoundingClientRect().right)}`); }) : [];
         expect(over, `${vp.name} ${tab} overflow by ${over}px: ${culprits.join(" | ")}`).toBeLessThanOrEqual(0);
-        const nav = vp.width <= 1100 ? ".bottomnav" : ".tabs";
+        const nav = vp.width <= 1100 ? ".bottomnav" : ".side";
         await expect(page.locator(nav)).toBeVisible();
         await expect(page.locator(".main")).not.toBeEmpty();
         if (tab === "terrain" || tab === "emergency") await page.screenshot({ path: info.outputPath(`${vp.name}-${tab}.png`) });

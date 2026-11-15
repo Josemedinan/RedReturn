@@ -1,6 +1,6 @@
 "use client";
 import { AlertTriangle, Info, LoaderCircle } from "lucide-react";
-import type { ReactNode } from "react";
+import type { ComponentType, ReactNode } from "react";
 import type { DatasetLayer } from "@/lib/types";
 
 export function Panel({ title, right, children, className = "" }: { title: string; right?: ReactNode; children: ReactNode; className?: string }) {
@@ -28,4 +28,7 @@ export function NumField({ label, value, onChange, min, max, step = 1, unit, hin
 }
 export function Range({ label, value, onChange, min, max, step = 1, unit = "" }: { label: string; value: number; onChange: (v: number) => void; min: number; max: number; step?: number; unit?: string }) {
   return <label className="range"><span>{label}<b>{value}{unit}</b></span><input type="range" min={min} max={max} step={step} value={value} onChange={e => onChange(Number(e.target.value))} /></label>;
+}
+export function PageHead({ icon: Icon, title, children, right }: { icon?: ComponentType<{ size?: number }>; title: string; children?: ReactNode; right?: ReactNode }) {
+  return <div className="pagehead"><div className="ph-main">{Icon && <span className="ph-ico" aria-hidden><Icon size={18} /></span>}<div><h1>{title}</h1>{children && <p>{children}</p>}</div></div>{right && <div className="ph-right">{right}</div>}</div>;
 }

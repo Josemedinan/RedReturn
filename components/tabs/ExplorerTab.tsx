@@ -5,7 +5,8 @@ import { CATALOG, LAYERS } from "@/data/catalog";
 import { useMissionStore } from "@/lib/store";
 import { coord } from "@/lib/format";
 import { normalizeLon } from "@/lib/mars";
-import { Badge, Loading, NumField, Panel } from "../ui";
+import { Globe2 } from "lucide-react";
+import { Badge, Loading, NumField, PageHead, Panel } from "../ui";
 import { GlobalMap } from "../GlobalMap";
 
 const Globe = dynamic(() => import("../AdvancedMarsGlobe"), { ssr: false, loading: () => <div className="globe"><Loading label="Loading 3D globe…" /></div> });
@@ -21,8 +22,10 @@ export function ExplorerTab() {
   const pick = (p: { lat: number; lon: number }) => { s.setPoint({ lat: +p.lat.toFixed(4), lon: +normalizeLon(p.lon).toFixed(4) }); };
   const place = (c: (typeof CATALOG)[number], as: "origin" | "destination") => { (as === "origin" ? s.setOrigin : s.setDestination)({ lat: c.lat, lon: c.lon, name: c.name }); setFocus({ lat: c.lat, lon: c.lon }); };
   return (
-    <div className="grid split-r">
-      <div className="stack">
+    <div className="stack" style={{ gap: 12 }}>
+    <PageHead icon={Globe2} title="Mars Explorer">Choose the base and the target on the globe or map, switch NASA data layers, or pick a named feature. Green windows have numeric terrain.</PageHead>
+    <div className="dash">
+      <div className="col c4 side-sticky">
         <Panel title="Select points">
           <div className="seg" role="group" aria-label="Which point does a map click set?">
             <button aria-pressed={s.selection === "origin"} onClick={() => s.setSelection("origin")}>Base</button><button aria-pressed={s.selection === "destination"} onClick={() => s.setSelection("destination")}>Target</button>
@@ -48,12 +51,13 @@ export function ExplorerTab() {
           <p className="tiny dim" style={{ marginTop: 8 }}>Approximate centres; verify with the USGS Planetary Gazetteer.</p>
         </Panel>
       </div>
-      <div className="stack">
+      <div className="col c8">
         <div className="row between"><div className="seg" role="group" aria-label="View"><button aria-pressed={view === "globe"} onClick={() => setView("globe")}>3D globe</button><button aria-pressed={view === "map"} onClick={() => setView("map")}>2D map</button></div><span className="tiny dim num">{hover ? coord(hover.lat, hover.lon) : "hover the map for coordinates"}</span></div>
         {view === "globe" ? <Globe layer={s.layer} origin={s.origin} destination={s.destination} focus={focus} onPick={pick} /> : null}
         <GlobalMap layer={s.layer} origin={s.origin} destination={s.destination} coverage={cover} onPick={pick} onHover={setHover} />
         <p className="tiny dim">Globe and map share the same base/target/layer state. Layers are imagery or radiance products from NASA; colour is never read back as elevation. Local terrain analysis lives in the Terrain tab.</p>
       </div>
+    </div>
     </div>
   );
 }

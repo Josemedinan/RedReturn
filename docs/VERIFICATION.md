@@ -37,3 +37,12 @@ Quality: axe-core WCAG 2.0/2.1 A+AA on all 8 tabs (no serious/critical), keyboar
 
 ## NOT executed / unverified
 Hosted deployment (no credentials; none attempted) · pushing the branch (no write permission to `JoshuaRosales7/RedReturn`) · GitHub Actions run (workflow edited, **never executed**; includes a new `e2e` job) · `render.yaml` · real-device/Safari/Firefox testing · screen-reader testing · Lighthouse · `npm audit` · optional language-model path · physical validation of the resource model · Global Offers page contents.
+
+## UI redesign pass (dashboard layout, terrain map fix, guided tour)
+
+Run after the Docker verification above, on a different stack — read the numbers accordingly:
+
+- Playwright: **25/25 pass** against `next dev` (:3000) + local venv API (:8000), not against Docker. Adds 2 specs (first-visit tour; relief map and 3D mesh render) and updates the nav selector. The 23 Docker-stack runs listed above predate this change; the Docker images were **not** rebuilt or re-tested after the redesign.
+- `tsc --noEmit` clean, `npm test` 23/23, `npm run build` succeeds. Backend untouched (76 pytest from the earlier run not repeated).
+- Visual checks were done by eye on desktop 1440 px and mobile 375 px for the Terrain, Planner and Overview tabs only; other tabs are covered by the axe and no-overflow tests, not by visual review.
+- The 3D-mesh test guards against a blank canvas by screenshot size (>20 KB); it does not prove geometry is correct.

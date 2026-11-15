@@ -156,3 +156,42 @@ test.describe("API unavailable (safe fallback)", () => {
     await expect(page.locator("table.t", { hasText: "Ascent" })).toHaveCount(0);
   });
 });
+
+test.describe("Guided tour", () => {
+  test("shows on first visit, walks the sections, and is remembered", async ({ page }) => {
+    await openApp(page, { tour: true });
+    const dlg = page.getByRole("dialog", { name: /Guided tour/ });
+    await expect(dlg).toBeVisible();
+    await expect(dlg).toContainText("Welcome to RedReturn");
+    await dlg.getByRole("button", { name: "Take the tour" }).click();
+    await dlg.getByRole("button", { name: "Next" }).click();           // Explorer
+    await dlg.getByRole("button", { name: "Next" }).click();           // Terrain
+    await expect(dlg).toContainText("3 · Terrain");
+    await expect(page.getByRole("heading", { name: "Terrain", level: 1 })).toBeVisible();   // the tour navigates for you
+    await dlg.getByRole("button", { name: "Back" }).click();
+    await expect(dlg).toContainText("2 · Mars Explorer");
+    await page.keyboard.press("Escape");                                 // skip
+    await expect(dlg).toBeHidden();
+    await page.reload();
+    await expect(page.getByRole("heading", { name: /Can the crew reach the target/ })).toBeVisible();
+    await expect(page.getByRole("dialog", { name: /Guided tour/ })).toBeHidden();   // remembered
+    await page.getByRole("button", { name: "Show guided tour" }).click();           // replay from the ? button
+    await expect(page.getByRole("dialog", { name: /Guided tour/ })).toContainText("Welcome to RedReturn");
+  });
+});
+
+test.describe("Terrain map", () => {
+  test("relief map and 3D mesh both render with routes, colour bar and exaggeration control", async ({ page }) => {
+    await openApp(page);
+    await gotoTab(page, "terrain");
+    await expect(page.locator("canvas[aria-label^='Shaded relief']")).toBeVisible();
+    await expect(page.locator(".cbar")).toBeVisible();
+    await page.getByRole("button", { name: "3D mesh" }).click();
+    await expect(page.locator("#main .mesh canvas")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByLabel("Vertical exaggeration")).toBeVisible();
+    // A blank/black WebGL view compresses to a few hundred bytes; a rendered terrain with routes is far larger.
+    await page.waitForTimeout(1500);
+    const png = await page.locator("#main .mesh canvas").screenshot();
+    expect(png.length).toBeGreaterThan(20_000);
+  });
+});

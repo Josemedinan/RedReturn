@@ -1,8 +1,9 @@
 "use client";
 import { useEffect } from "react";
+import { Activity } from "lucide-react";
 import { useMissionStore } from "@/lib/store";
 import { fmt, FACTOR_LABEL, STRATEGY_LABEL } from "@/lib/format";
-import { Badge, Empty, ErrorState, Loading, Notice, Panel, Stat } from "../ui";
+import { Badge, Empty, ErrorState, Loading, Notice, PageHead, Panel, Stat } from "../ui";
 import { MarginHistogram, Tornado } from "../charts";
 
 export function RiskTab() {
@@ -11,13 +12,13 @@ export function RiskTab() {
   if (!alt) return <Panel title="Risk Lab">{s.busy.alt ? <Loading label="Planning routes first…" /> : <Empty title="Plan a route first">Risk analysis runs on the recommended route.</Empty>}</Panel>;
   const strategy = alt.recommended ?? s.strategy;
   return (
-    <div className="stack">
+    <div className="stack" style={{ gap: 12 }}>
+      <PageHead icon={Activity} title="Risk Lab" right={<button className="btn primary" onClick={() => void s.runRisk()} disabled={s.busy.risk}>{s.busy.risk ? "Running…" : "Re-run ensemble"}</button>}>Seeded Monte Carlo on the recommended route: how much of the decision depends on uncertain inputs. Route analysed: <b>{STRATEGY_LABEL[strategy]}</b>.</PageHead>
       <Notice><b>Hypothetical ensemble — not a survival probability.</b> The input spreads below are assumptions chosen to explore sensitivity. The output is the share of simulated scenarios that satisfy the modelled constraints, nothing more.</Notice>
-      <div className="row between"><span className="small muted">Route analysed: <b>{STRATEGY_LABEL[strategy]}</b> · seeded, reproducible</span><button className="btn primary" onClick={() => void s.runRisk()} disabled={s.busy.risk}>{s.busy.risk ? "Running…" : "Re-run ensemble"}</button></div>
       {s.busy.risk && !r && <Loading label="Running seeded Monte Carlo…" />}
       {s.errors.risk && !r && <ErrorState message={s.errors.risk} retry={() => void s.runRisk()} />}
       {r && <>
-        <div className="grid g4">
+        <div className="kpis">
           <Stat label="Scenarios satisfying constraints" value={`${fmt(r.fraction_satisfying_constraints * 100, 1)}%`} detail={`MC sampling interval ${fmt(r.monte_carlo_sampling_interval_95.low * 100, 1)}–${fmt(r.monte_carlo_sampling_interval_95.high * 100, 1)}% (95%, sampling error only)`} tone={r.fraction_satisfying_constraints > 0.9 ? "ok" : r.fraction_satisfying_constraints > 0.6 ? "warn" : "bad"} />
           <Stat label="Dominant failure mode" value={r.dominant_failure_mode ? FACTOR_LABEL[r.dominant_failure_mode] : "None"} detail={r.dominant_failure_mode ? `${r.dominant_failure_mode_counts[r.dominant_failure_mode]} of ${r.runs} runs` : "no failing runs"} />
           <Stat label="Total time P10 / P50 / P90" value={`${fmt(r.distributions.duration_hours.p50)} h`} detail={`${fmt(r.distributions.duration_hours.p10)} – ${fmt(r.distributions.duration_hours.p90)} h`} />

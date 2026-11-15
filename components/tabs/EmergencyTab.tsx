@@ -1,9 +1,9 @@
 "use client";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Siren, Trash2 } from "lucide-react";
 import { useMissionStore } from "@/lib/store";
 import { fmt, FACTOR_LABEL } from "@/lib/format";
 import type { IncidentKind } from "@/lib/types";
-import { Badge, Empty, ErrorState, Loading, Notice, NumField, Panel, Range } from "../ui";
+import { Badge, Empty, ErrorState, Loading, Notice, NumField, PageHead, Panel, Range } from "../ui";
 
 const KINDS: { id: IncidentKind; label: string; unit: string; def: number; max: number }[] = [
   { id: "battery_loss", label: "Battery capacity loss", unit: "%", def: 35, max: 100 },
@@ -22,8 +22,10 @@ export function EmergencyTab() {
   const s = useMissionStore(); const sc = s.scenario; const alt = s.alternatives;
   if (!alt) return <Panel title="Emergency simulator">{s.busy.alt ? <Loading label="Planning routes first…" /> : <Empty title="Plan a route first">The simulator breaks the recommended plan.</Empty>}</Panel>;
   return (
-    <div className="grid split-r">
-      <div className="stack">
+    <div className="stack" style={{ gap: 12 }}>
+    <PageHead icon={Siren} title="Emergency">Break the plan on purpose, then compare continuing, rerouting, skipping science and aborting to base. Incident sizes are what-ifs.</PageHead>
+    <div className="dash">
+      <div className="col c4 side-sticky">
         <Panel title="1 · Choose the incident(s)" right={<button className="btn sm" disabled={s.incidents.length >= 4} onClick={() => s.setIncidents([...s.incidents, { kind: "travel_delay", magnitude: 1.5 }])}><Plus size={13} />Add</button>}>
           {s.incidents.map((inc, i) => { const k = KINDS.find(x => x.id === inc.kind)!; return (
             <div key={i} className="stack" style={{ marginBottom: 10 }}>
@@ -38,7 +40,7 @@ export function EmergencyTab() {
         </Panel>
         <Notice>Research and education decision-support prototype — <b>not operational emergency guidance</b>. Incident sizes are what-ifs with unknown likelihood.</Notice>
       </div>
-      <div className="stack">
+      <div className="col c8">
         {s.busy.scenario && !sc && <Loading label="Recomputing resources, replanning on the DEM…" />}
         {s.errors.scenario && <ErrorState message={s.errors.scenario} retry={() => void s.runScenario()} />}
         {!sc && !s.busy.scenario && !s.errors.scenario && <Panel title="Result"><Empty title="Nothing simulated yet">Pick the incident and press “Simulate failure &amp; replan”.</Empty></Panel>}
@@ -63,6 +65,7 @@ export function EmergencyTab() {
           <Panel title="Unavoidable uncertainty"><ul className="small muted stack" style={{ margin: 0, paddingLeft: 18 }}>{sc.unavoidable_uncertainty.map(u => <li key={u}>{u}</li>)}</ul></Panel>
         </>}
       </div>
+    </div>
     </div>
   );
 }

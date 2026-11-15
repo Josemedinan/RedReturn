@@ -1,15 +1,17 @@
 "use client";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Route as RouteIcon, Trash2 } from "lucide-react";
 import { useMissionStore } from "@/lib/store";
 import { fmt, FACTOR_LABEL, STRATEGY_COLOR, STRATEGY_LABEL, hours } from "@/lib/format";
-import { Badge, ErrorState, Loading, NumField, Notice, Panel, Range } from "../ui";
+import { Badge, ErrorState, Loading, NumField, Notice, PageHead, Panel, Range } from "../ui";
 import { CompareBars } from "../charts";
 
 export function PlannerTab() {
   const s = useMissionStore(); const c = s.config; const alt = s.alternatives;
   return (
-    <div className="grid split-r">
-      <div className="stack">
+    <div className="stack" style={{ gap: 12 }}>
+    <PageHead icon={RouteIcon} title="Planner">Set the crew, rover, consumables, reserves and science stops on the left; the four route strategies re-plan live on the right.</PageHead>
+    <div className="dash">
+      <div className="col c4">
         <Panel title="Crew & rover"><div className="grid g2">
           <NumField label="Crew" value={c.crew} min={1} max={12} onChange={v => s.setConfig({ crew: Math.round(v) })} />
           <NumField label="Speed" unit="km/h" value={c.speedKmh} min={0.5} max={50} step={0.1} onChange={v => s.setConfig({ speedKmh: v })} />
@@ -41,7 +43,7 @@ export function PlannerTab() {
           </div>)}
         </Panel>
       </div>
-      <div className="stack">
+      <div className="col c8">
         {s.busy.alt && <Loading label="Re-planning routes on the DEM…" />}
         {s.errors.alternatives && !alt && <ErrorState message={s.errors.alternatives} retry={() => void s.refreshAlternatives()} />}
         {alt && <>
@@ -67,6 +69,7 @@ export function PlannerTab() {
           <Notice tone="info">Routes use cell-centre elevations of a 463 m grid; infeasible = blocked, never extrapolated. Resource figures are model outputs under your assumptions, not forecasts.</Notice>
         </>}
       </div>
+    </div>
     </div>
   );
 }

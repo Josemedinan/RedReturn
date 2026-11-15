@@ -139,8 +139,8 @@ export const useMissionStore = create<Store>((set, get) => {
   async function loadHeightfield(tile: string) {
     const c = fresh("hf"); const s = get();
     const pts = [s.origin, s.destination, ...s.stops];
-    const pad = 0.25;
     const lat = pts.map(p => p.lat), lon = pts.map(p => p.lon);
+    const pad = Math.max(0.07, 0.2 * Math.max(Math.max(...lat) - Math.min(...lat), Math.max(...lon) - Math.min(...lon)));   // frame the route, not the whole window
     try {
       const q = new URLSearchParams({ tile, lat_min: String(Math.min(...lat) - pad), lat_max: String(Math.max(...lat) + pad), lon_min: String(Math.min(...lon) - pad), lon_max: String(Math.max(...lon) + pad), max_size: "128" });
       set({ heightfield: await api<Heightfield>(`/api/terrain/heightfield?${q}`, { signal: c.signal }) }); ok("heightfield", "live");
