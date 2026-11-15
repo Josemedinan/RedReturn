@@ -11,9 +11,9 @@ from fastapi.responses import JSONResponse
 from .errors import body
 
 MAX_BODY_BYTES = int(os.getenv("REDRETURN_MAX_BODY_BYTES", "200000"))
-RATE_PER_MIN = int(os.getenv("REDRETURN_RATE_PER_MIN", "120"))
+RATE_PER_MIN = int(os.getenv("REDRETURN_RATE_PER_MIN", "600"))
 HEAVY_PATHS = ("/api/risk", "/api/routes/alternatives", "/api/scenarios", "/api/ares", "/api/ai", "/api/reports")
-HEAVY_PER_MIN = int(os.getenv("REDRETURN_HEAVY_PER_MIN", "30"))
+HEAVY_PER_MIN = int(os.getenv("REDRETURN_HEAVY_PER_MIN", "180"))
 _buckets: dict[tuple[str, str], tuple[float, float]] = defaultdict(lambda: (0.0, 0.0))
 
 

@@ -124,4 +124,5 @@ def compare(routes: list[dict]) -> list[dict]:
 
 
 def request_hash(model) -> str:
-    return hashlib.sha256(json.dumps(model.model_dump(), sort_keys=True).encode()).hexdigest()[:16]
+    from ..scientific.risk import canon
+    return hashlib.sha256(json.dumps(canon(model.model_dump()), sort_keys=True).encode()).hexdigest()[:16]

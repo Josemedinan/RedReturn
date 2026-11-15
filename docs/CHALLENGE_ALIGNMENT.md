@@ -19,11 +19,11 @@ URL: https://www.spaceappschallenge.org/2026/challenges/interplanetary-survival-
 | Scientific objectives | Science stops with dwell time; science-prioritised strategy (disabled without declared stops) | Met; no automatic science-value layer exists |
 | Usable interface (HUD/tablet/habitat) | Mission-operations web UI, responsive to 375 px, keyboard shortcuts 1–8 | Met for planning use; not a suit HUD |
 
-## Unresolved / disclosed items
-1. **"Teams are not allowed to begin working on the challenges prior to the hackathon"** (official FAQ). This repository predates the 2026 hackathon (initial history is older than the event, which runs 14–15 Nov 2026). The team must decide how to disclose pre-existing work to organizers. This document does not resolve that eligibility question.
-2. **SI-tool disclosure is mandatory** in the submission ("each team's project submission must include a description of how SI tools were used"). Draft text is in `JUDGING_EVIDENCE.md`.
-3. **Judging & Awards Guide and Project Submission Guide** (published 13 Nov) were not accessible to this work; submission format details (video length, fields) are **unverified**. The FAQ says submission is via the team's project page on spaceappschallenge.org.
-4. **Global Offers**: the page `/2026/global-offers/` required a login ("You must be logged in to view this content"), so offer contents were **not read**. Search snippets list Google, Microsoft, Meteomatics, GoDaddy, Miro as collaborators. See `docs/GLOBAL_OFFERS.md`.
+## Unresolved / disclosed items (updated after the release pass; details in `COMPLIANCE.md`)
+1. **Pre-existing code.** The FAQ says teams may not begin working on challenges before the hackathon; this repository's first commit is 2026-10-13. The T&C do not address pre-existing code; the originality checkbox applies. **Unresolved — ask the organisers** (`DISCLOSURE_PREEXISTING_CODE.md`). Git history is intact.
+2. **SI disclosure** is mandatory and the idea must be the team's own (`SI_USE.md`).
+3. **Submission rules now verified:** demo ≤ 30 s video or ≤ 7 slides (not yet produced), public links, References field, official judging criteria Impact/Creativity/Validity/Relevance/Presentation (`SUBMISSION_PACK.md`).
+4. **Global Offers** page still login-gated — not read (`GLOBAL_OFFERS.md`).
 
 ## Constraint the product obeys
 No claim of NASA validation or endorsement; the challenge page notes NASA does not endorse non-U.S.-Government entities.

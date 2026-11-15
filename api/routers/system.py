@@ -33,7 +33,7 @@ def health():
 @router.get("/api/diagnostics", tags=["system"])
 def diagnostics():
     return {"version": VERSION, "python": sys.version.split()[0], "platform": platform.platform(), "numpy": np.__version__,
-            "dem": registry.status(), "limits": {"rate_per_min": os.getenv("REDRETURN_RATE_PER_MIN", "120"),
+            "dem": registry.status(), "limits": {"rate_per_min": os.getenv("REDRETURN_RATE_PER_MIN", "600"),
                                                  "max_body_bytes": os.getenv("REDRETURN_MAX_BODY_BYTES", "200000")}}
 
 

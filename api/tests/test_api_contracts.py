@@ -134,3 +134,28 @@ def test_golden_vectors_match_engine():
             assert r[k] == pytest.approx(v, rel=1e-9) if not isinstance(v, (str, bool)) else r[k] == v, (name, k)
     for row in g["geodesy"]:
         assert haversine_km(*row["a"], *row["b"]) == pytest.approx(row["km"], rel=1e-12)
+
+
+def test_equivalent_requests_give_identical_monte_carlo():
+    """Regression: omitting a default (int 18) vs sending it explicitly (18.0) or renaming a point must not change the seed."""
+    implicit = {**BODY, "runs": 500, "strategy": "resource"}
+    explicit = {**BODY, "runs": 500, "strategy": "resource", "config": {"oxygen_kg": 18, "energy_kwh": 45.0, "crew": 2, "max_slope_deg": 15}}
+    renamed = {**implicit, "origin": {**BODY["origin"], "name": "Another label"}}
+    a, b, c = (client.post("/api/risk/analyze", json=x).json() for x in (implicit, explicit, renamed))
+    assert a["result_sha256"] == b["result_sha256"] == c["result_sha256"]
+    assert a["request_sha256"] == b["request_sha256"] == c["request_sha256"]
+
+
+def test_rate_limited_and_oversized_responses_carry_cors_headers(monkeypatch):
+    """Regression: a 429/413 without CORS headers looks like a network failure to the browser (and triggered a silent offline fallback)."""
+    monkeypatch.setattr(limits, "RATE_PER_MIN", 2)
+    limits.reset()
+    hdr = {"Origin": "http://localhost:3000"}
+    codes = [client.get("/api/health", headers=hdr) for _ in range(5)]
+    limited = [r for r in codes if r.status_code == 429]
+    assert limited and all(r.headers.get("access-control-allow-origin") == "http://localhost:3000" for r in limited)
+    limits.reset()
+    monkeypatch.setattr(limits, "RATE_PER_MIN", 100)
+    monkeypatch.setattr(limits, "MAX_BODY_BYTES", 10)
+    big = client.post("/api/terrain/profile", json={"points": [BODY["origin"], BODY["destination"]]}, headers=hdr)
+    assert big.status_code == 413 and big.headers.get("access-control-allow-origin") == "http://localhost:3000"

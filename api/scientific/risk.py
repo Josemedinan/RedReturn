@@ -68,8 +68,21 @@ def _draw(rng: np.random.Generator, d: Dist, n: int, sigma: float | None) -> np.
     raise ValueError(d.law)
 
 
+def canon(o):
+    """Canonical form for hashing: all numbers as floats (18 == 18.0), display `name` fields ignored."""
+    if isinstance(o, bool):
+        return o
+    if isinstance(o, (int, float)):
+        return float(o)
+    if isinstance(o, dict):
+        return {k: canon(v) for k, v in o.items() if k != "name"}
+    if isinstance(o, (list, tuple)):
+        return [canon(v) for v in o]
+    return o
+
+
 def _request_seed(payload: dict, seed: int) -> int:
-    h = hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
+    h = hashlib.sha256(json.dumps(canon(payload), sort_keys=True, default=str).encode()).hexdigest()
     return (int(h[:8], 16) ^ seed) & 0xFFFFFFFF
 
 

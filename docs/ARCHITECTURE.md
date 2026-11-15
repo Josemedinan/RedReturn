@@ -22,4 +22,4 @@ origin/target/config/stops → `/api/routes/alternatives` (DEM tile lookup → f
 `terrain_status`: `insufficient-data` (flat legacy routes) or `dem-evaluated-coarse`. `certification` is always `NOT_CERTIFIABLE`. Samples are `cell_value | interpolated | nodata | outside_coverage`.
 
 ## Security / reliability
-Typed error envelope; Pydantic bounds; list caps; grid cap; body cap; per-IP token bucket (120/min, 30/min heavy); CORS allow-list from env, GET/POST only, no credentials; no secrets in the client; optional LLM key server-side only; non-root container with healthcheck. WebGL context-loss recovery on the globe; error boundaries per tab; request cancellation on every store action.
+Typed error envelope; Pydantic bounds; list caps; grid cap; body cap; per-IP token bucket (600/min, 180/min heavy; env-tunable); CORS allow-list from env, GET/POST only, no credentials; no secrets in the client; optional LLM key server-side only; non-root container with healthcheck. WebGL context-loss recovery on the globe; error boundaries per tab; request cancellation on every store action.

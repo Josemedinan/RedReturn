@@ -24,10 +24,12 @@ Status legend: **Fixed** (verified by a test or browser check), **Mitigated**, *
 | 12 | Low | Python tests never executed in the repo's record; CI used Node 20 while Docker used 22. | **Fixed** – 74 pytest cases run; CI aligned on Node 22 and runs typecheck, Vitest, pytest, golden drift check. |
 | 13 | Low | `package.json` `api` script used a Windows-only venv path. | **Fixed**. |
 | 14 | Low | `astar` was 4-neighbour Manhattan and unused by the app. | **Mitigated** – kept as `scientific/legacy.py` for the API contract; new 8-neighbour bounded A* is used. |
-| 15 | Low | API Dockerfile ran as root, no healthcheck, no DEM data guarantee. | **Fixed** (non-root, healthcheck; DEM windows are committed in `api/data/dem`). |
+| 15 | Low | API Dockerfile ran as root, no healthcheck, no DEM data guarantee. | Changed in pass 1 but **unverified**; pass 2 found the image crashed (missing `libexpat1`) — **now fixed and verified** by running it (see #19). |
 | 16 | Medium | NASA challenge alignment never established; README only said "NASA Space Apps". | **Fixed** – see `CHALLENGE_ALIGNMENT.md` (official challenge identified). |
 | 17 | Low | ~5.8 MB of image assets existed only to drive finding #1. | **Fixed** – removed. |
 | 18 | Medium | Real defects found by the new tests during this work: slope reported at a nodata cell; floating-point cell-centre queries labelled "interpolated"; unknown local slope treated as flat in routing; corridor too narrow for detours. | **Fixed** (each has a regression test). |
+
+| 19 | High | Found in the release pass by running things: API container crash (`libexpat`), missing `.dockerignore`, non-canonical Monte Carlo seeding (same request, different result), CORS missing on 429/413 (browser saw network error → silent snapshot fallback), low-contrast text, Vitest collecting Playwright specs, tracked `tsbuildinfo`. | **Fixed**, each with a test or run (`VERIFICATION.md`). |
 
 ## Existing features that worked and were preserved
 Mars Trek tile globe/2D map concept, great-circle geometry (antimeridian/pole safe), round-trip resource accounting, reserve rules, PDF/JSON/GeoJSON export concept, FastAPI route/mission endpoints (kept, backward compatible), `/api/health`.
@@ -38,6 +40,6 @@ Client-side NASA Mars Trek WMTS tiles (HTTP 200, open CORS verified 2026-11-14);
 ## Still open (not hidden)
 - No rock/boulder/soil-strength data: rover-scale obstacle avoidance is absent.
 - Only two cached 8°×8° MOLA windows (Jezero, Gale). Other regions return `outside_dem_coverage`.
-- Playwright end-to-end tests were **not** added; browser QA was manual (see `VERIFICATION.md`).
+- (Closed in pass 2) Playwright suite added: 23 tests, `VERIFICATION.md`.
 - Rate limiter is in-memory (one process).
 - Optional language-model path untested.

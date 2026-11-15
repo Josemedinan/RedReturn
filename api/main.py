@@ -20,8 +20,8 @@ DESCRIPTION = """Transparent, deterministic Mars mission planning services.
 
 app = FastAPI(title="RedReturn API", version=system.VERSION, description=DESCRIPTION)
 origins = [o.strip() for o in os.getenv("REDRETURN_CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",") if o.strip()]
+limits.install(app)   # added first => inner; CORS is added last => outermost, so 413/429 responses still carry CORS headers
 app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET", "POST"], allow_headers=["Content-Type"], max_age=600)
-limits.install(app)
 errors.install(app)
 for r in (system.router, terrain.router, routes.router, mission.router, ares.router):
     app.include_router(r)

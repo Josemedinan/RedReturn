@@ -41,3 +41,6 @@ API: `docker build -f api/Dockerfile -t redreturn-api . && docker run -p 8000:80
 
 ## 14 Evidence vs competition criteria
 `JUDGING_EVIDENCE.md` and `CHALLENGE_ALIGNMENT.md`.
+
+---
+**Update (release pass):** this report was audited; corrections, new evidence (Docker, Playwright, independent validation) and the release-readiness table are in `RELEASE_READINESS.md`, `VERIFICATION.md` and `COMPLIANCE.md`. Test counts are now 76 pytest, 23 Vitest, 23 Playwright; the Monte Carlo demo value is 75.1 %.
