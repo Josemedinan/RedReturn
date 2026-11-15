@@ -194,4 +194,16 @@ test.describe("Terrain map", () => {
     const png = await page.locator("#main .mesh canvas").screenshot();
     expect(png.length).toBeGreaterThan(20_000);
   });
+
+  test("3D mesh is not blank at tablet width (regression: canvas had no explicit height)", async ({ page }) => {
+    await page.setViewportSize({ width: 800, height: 600 });
+    await openApp(page);
+    await page.locator(".bottomnav").getByRole("tab", { name: "Terrain" }).click();
+    await page.getByRole("button", { name: "3D mesh" }).click();
+    await page.locator(".mesh-stage").scrollIntoViewIfNeeded();
+    await page.waitForTimeout(2500);
+    const box = await page.locator(".mesh-stage").boundingBox();
+    expect(box!.height).toBeGreaterThan(300);
+    expect((await page.locator("#main .mesh canvas").screenshot()).length).toBeGreaterThan(20_000);
+  });
 });

@@ -53,7 +53,7 @@ export default function TerrainMesh3D({ hf, routes, show, origin, destination, s
   const pin = (p: Point, color: string, key: string) => { const [x, y, z] = to(p.lat, p.lon, elevAt(p)); return <group key={key} position={[x, y, z]}><mesh position={[0, .35, 0]}><cylinderGeometry args={[.025, .025, .7, 8]} /><meshBasicMaterial color={color} /></mesh><mesh position={[0, .75, 0]}><sphereGeometry args={[.11, 16, 12]} /><meshBasicMaterial color={color} /></mesh></group>; };
   return (
     <div className="mapwrap mesh">
-      <Canvas key={view} camera={{ position: [0, sz * 0.5 + 2.6, sz * 0.62 + 5.4], fov: 38, near: .1, far: 120 }} dpr={[1, 1.5]} gl={{ antialias: true }} aria-label="3D terrain from MOLA elevations">
+      <div className="mesh-stage"><Canvas key={view} camera={{ position: [0, sz * 0.5 + 2.6, sz * 0.62 + 5.4], fov: 38, near: .1, far: 120 }} dpr={[1, 1.5]} gl={{ antialias: true }} aria-label="3D terrain from MOLA elevations">
         <color attach="background" args={["#07090c"]} />
         <hemisphereLight args={["#d9e2ff", "#40322a", 0.9]} />
         <directionalLight position={[-6, 7, 5]} intensity={2.1} />
@@ -66,7 +66,7 @@ export default function TerrainMesh3D({ hf, routes, show, origin, destination, s
         </group>; })}
         {pin(origin, "#62b8a4", "base")}{pin(destination, "#e8794a", "target")}
         <OrbitControls target={[0, .2, 0]} enableDamping dampingFactor={.08} minDistance={3} maxDistance={24} maxPolarAngle={Math.PI / 2.05} />
-      </Canvas>
+      </Canvas></div>
       <div className="mesh-hud">
         <span className="chip ok">Base</span><span className="chip warn">Target</span>
         <label className="range"><span>Vertical exaggeration<b>{exag}×</b></span><input type="range" min={1} max={15} step={0.5} value={exag} onChange={e => setExag(Number(e.target.value))} aria-label="Vertical exaggeration" /></label>

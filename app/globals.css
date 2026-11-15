@@ -128,7 +128,7 @@ table.t { width: 100%; border-collapse: collapse; font-size: 13px; }
 .mapbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 7px 10px; background: var(--bg2); border-top: 1px solid var(--line); }
 .cbar { display: flex; align-items: center; gap: 6px; } .cbar i { display: block; width: 150px; height: 8px; border-radius: 4px; border: 1px solid var(--line); }
 .map-north { position: absolute; right: 10px; top: 8px; display: grid; place-items: center; font: 700 11px var(--mono); color: #fff; text-shadow: 0 1px 3px #000; line-height: 1; } .map-north span { font-size: 16px; }
-.mesh { height: auto; } .mesh canvas { height: clamp(340px, 52vh, 560px) !important; }
+.mesh-stage { position: relative; width: 100%; height: clamp(340px, 52vh, 560px); }
 .mesh-hud { position: absolute; left: 10px; top: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; z-index: 2; padding: 6px 8px; background: rgba(10,13,17,.82); border: 1px solid var(--line); border-radius: var(--r); }
 .mesh-hud .range { width: 170px; }
 .map-flag { position: absolute; right: 6px; top: 6px; }
@@ -157,7 +157,7 @@ table.t { width: 100%; border-collapse: collapse; font-size: 13px; }
 @media (max-width: 1100px) {
   .split, .split-r { grid-template-columns: minmax(0, 1fr); } .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .g3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .frame { grid-template-columns: minmax(0, 1fr); } .side { display: none; } .topbar { justify-content: space-between; } .main { padding: 12px 14px 76px; } .legal { padding-bottom: 60px; }
-  .c8, .c7, .c6, .c5, .c4, .c3 { grid-column: span 12; } .side-sticky { position: static; } .tour { bottom: 64px; }
+  .brand span, .ctx { display: none; } .c8, .c7, .c6, .c5, .c4, .c3 { grid-column: span 12; } .side-sticky { position: static; } .tour { bottom: 64px; }
   .bottomnav { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: var(--bg2); border-top: 1px solid var(--line); overflow-x: auto; padding-bottom: env(safe-area-inset-bottom); }
   .bottomnav button { flex: 1 0 64px; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 4px; background: none; border: 0; color: var(--dim); font-size: 10px; min-height: 52px; }
   .bottomnav button[aria-selected="true"] { color: var(--accent); }

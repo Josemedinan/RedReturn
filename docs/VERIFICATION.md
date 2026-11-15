@@ -40,9 +40,8 @@ Hosted deployment (no credentials; none attempted) · pushing the branch (no wri
 
 ## UI redesign pass (dashboard layout, terrain map fix, guided tour)
 
-Run after the Docker verification above, on a different stack — read the numbers accordingly:
-
-- Playwright: **25/25 pass** against `next dev` (:3000) + local venv API (:8000), not against Docker. Adds 2 specs (first-visit tour; relief map and 3D mesh render) and updates the nav selector. The 23 Docker-stack runs listed above predate this change; the Docker images were **not** rebuilt or re-tested after the redesign.
-- `tsc --noEmit` clean, `npm test` 23/23, `npm run build` succeeds. Backend untouched (76 pytest from the earlier run not repeated).
-- Visual checks were done by eye on desktop 1440 px and mobile 375 px for the Terrain, Planner and Overview tabs only; other tabs are covered by the axe and no-overflow tests, not by visual review.
-- The 3D-mesh test guards against a blank canvas by screenshot size (>20 KB); it does not prove geometry is correct.
+- Playwright against the **rebuilt Docker stack** (web :3000, API :8000): **26/26 pass** (the 25 below plus a tablet-width 3D regression test added afterwards, run alone against the same stack). An earlier 25/25 run was against `next dev`.
+- Defect found by hand after the first push: with a short route the 3D mesh rendered blank at ~800 px width (the WebGL canvas sat in a container with no explicit height). Fixed with a fixed-height stage; verified by eye at 800 px and 1440 px. The new regression test was not run against the pre-fix code, so it is not proven to fail without the fix.
+- The earlier tests missed this because they only used the default 25 km demo route at 1280 px.
+- `tsc --noEmit` clean, `npm test` 23/23, `npm run build` succeeds. Backend untouched.
+- Visual review by eye: Overview, Terrain (relief and 3D), Planner on desktop; Overview on mobile. Other tabs are covered by axe and no-overflow tests only.
